@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="bootstrap/js/jquery.js"></script>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <script src="layer/layer.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row  text-center">
+            <h1>学生信息管理系统</h1>
+            <hr>
+            <a href="javascript:;" class="btn btn-success">首页</a>
+            <a href="/add" class="btn btn-danger">添加</a>
+            <a href="/search" class="btn btn-info">搜索</a>
+            <br>
+            <br>
+        </div>
+        <div class="row">
+            <!-- 表格 -->
+            <table class="table table-bordered table-condensed table-hover table-responsive text-center">
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">姓名</th>
+                    <th class="text-center">年龄</th>
+                    <th class="text-center">性别</th>
+                    <th class="text-center">爱好</th>
+                    <th class="text-center">操作</th>
+                </tr>
+                <%if(result.length!=0){%>
+                    <%for(var i=0;i<result.length;i++){%>
+                    <tr>
+                        <td><%=result[i]._id%></td>
+                        <td><%=result[i].name%></td>
+                        <td><%=result[i].age%></td>
+                        <td><%=result[i].sex%></td>
+                        <td><%=result[i].hobby%></td>
+                        <td>
+                            <a href="javascript:void(0)" data-id="<%=result[i]._id%>" onclick="del(this)"
+                                class="btn btn-success">删除</a>
+                            <a href="/edit?id=<%=result[i]._id%>" class="btn btn-warning">修改</a>
+                        </td>
+                    </tr>
+                <%}%>      
+                <ul class="pagination">
+                <%if(isUp){%>
+                    <li><a href="/?page=<%=page-1%>">上一页</a></li>
+                <%}else{%>
+                    <li class="disabled"><span>上一页</span></li>
+                <%}%>    
+
+                <%for(var i=1;i<=total;i++){%>
+                    <%if(i==page){%>
+                        <li class="active"><a href="/?page=<%=i%>"><%=i%></a></li>
+                        <%}else{%>
+                        <li><a href="/?page=<%=i%>"><%=i%></a></li>
+                    <%}%>   
+                <%}%>
+                <%if(isNext){%>
+                        <li><a href="/?page=<%=page+1%>">下一页</a></li>
+                   <%}else{%>
+                        <li class="disabled"><span>下一页</span></li>
+                   <%}%>   
+                </ul>
+                <%}else{%>
+                <tr>
+                    <td colspan="6">暂无数据！请添加</td>
+                </tr>
+                <%}%>   
+                </table>
+            </div>
+    </div>  
+</body>
+</html>
+
+<script>
+    function del(obj) {
+        var id = $(obj).attr("data-id")
+        layer.confirm("确定删除该数据吗?删除后不可恢复", function () {
+            $.get("/del", { id: id }, function (data) {
+                if (data.state == 1) {
+                    var length = $(obj).parents("tr").siblings("tr").length;
+                    layer.alert(data.msg, { icon: 1 }, function (index) {
+                        $(obj).parents("tr").remove()
+                        layer.close(index)
+                        length = length - 1;
+                        if (length == 0) {
+                            location.href = "/"
+                        }
+                    })
+                } else {
+                    layer.alert(data.msg, { icon: 0 }, function (index) {
+                        layer.close(index)
+                    })
+                }
+            })
+        })
+    }
+</script>
